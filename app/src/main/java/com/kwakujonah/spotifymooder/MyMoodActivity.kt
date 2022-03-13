@@ -65,10 +65,10 @@ class MyMoodActivity : AppCompatActivity() {
     }
 
     private fun prepareItems() {
-        itemsList.add("sleepy")
-        itemsList.add("happy")
-        itemsList.add("sarcastic")
-        itemsList.add("doubting")
+        itemsList.add("sleep")
+        itemsList.add("party")
+        itemsList.add("chill")
+        itemsList.add("alternative")
         customAdapter.notifyDataSetChanged()
     }
 

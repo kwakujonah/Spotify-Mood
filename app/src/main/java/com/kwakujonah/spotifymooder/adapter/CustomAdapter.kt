@@ -28,10 +28,10 @@ class CustomAdapter(private var itemsList: List<String>, private val itemClickLi
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.bind(itemClickListener)
         when(itemsList[position]){
-            "sleepy" -> Picasso.get().load(R.drawable.sleep).into(holder.itemImageView)
-            "happy" -> Picasso.get().load(R.drawable.smile).into(holder.itemImageView)
-            "sarcastic" -> Picasso.get().load(R.drawable.sarcastic).into(holder.itemImageView)
-            "doubting" -> Picasso.get().load(R.drawable.thinking).into(holder.itemImageView)
+            "sleep" -> Picasso.get().load(R.drawable.sleep).into(holder.itemImageView)
+            "party" -> Picasso.get().load(R.drawable.smile).into(holder.itemImageView)
+            "chill" -> Picasso.get().load(R.drawable.sarcastic).into(holder.itemImageView)
+            "alternative" -> Picasso.get().load(R.drawable.thinking).into(holder.itemImageView)
         }
         holder.itemTextView.text = itemsList[position]
     }

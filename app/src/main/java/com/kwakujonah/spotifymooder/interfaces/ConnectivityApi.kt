@@ -12,7 +12,7 @@ interface ConnectivityApi {
     suspend fun createToken(@Field("grant_type") first: String): Response<ResponseBody>
 
 
-    @GET("party/playlists/")
+    @GET("playlists/")
     suspend fun getPlaylists(@HeaderMap headers: Map<String, String>): Response<ResponseBody>
 
 
