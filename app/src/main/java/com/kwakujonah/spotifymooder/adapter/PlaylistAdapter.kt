@@ -14,8 +14,10 @@ internal class PlaylistAdapter (private var playlists : List<Playlist>, private 
 
     internal inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var image: ImageView = view.findViewById(R.id.playlistImageIv)
-        var description: TextView = view.findViewById(R.id.playlistTitleTv)
+        var title: TextView = view.findViewById(R.id.playlistTitleTv)
         var url: TextView = view.findViewById(R.id.playlistURLTv)
+        var duration: TextView = view.findViewById(R.id.playlistDurationTv)
+        var artist: TextView = view.findViewById(R.id.playlistArtistTv)
         fun bind(itemClickListener: (Int) -> Unit) {
             itemView.setOnClickListener { itemClickListener(adapterPosition) }
         }
@@ -35,8 +37,10 @@ internal class PlaylistAdapter (private var playlists : List<Playlist>, private 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.bind(itemClickListener)
         val listItem = playlists[position]
-        holder.description.text = listItem.getDescription()
+        holder.title.text = listItem.getTitle()
+        holder.artist.text = listItem.getArtist()
         holder.url.text = listItem.getURL()
+        holder.duration.text = listItem.getDuration()
         Picasso.get().load(listItem.getImage()).into(holder.image)
     }
 

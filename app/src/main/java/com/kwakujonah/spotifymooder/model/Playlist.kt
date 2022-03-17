@@ -1,15 +1,35 @@
 package com.kwakujonah.spotifymooder.model
 
-class Playlist(url: String?, description: String?, image: String?) {
+class Playlist(title: String?, artist: String?, url: String?, duration: String?, image: String?) {
 
+    private var title: String
+    private var artist: String
     private var url: String
-    private var description: String
+    private var duration: String
     private var image: String
 
     init {
+        this.title = title!!
+        this.artist = artist!!
         this.url = url!!
-        this.description = description!!
+        this.duration = duration!!
         this.image = image!!
+    }
+
+    fun getTitle(): String {
+        return title
+    }
+
+    fun setTitle(name: String?){
+        title = name!!
+    }
+
+    fun getArtist(): String {
+        return artist
+    }
+
+    fun setArtist(name: String?){
+        artist = name!!
     }
 
     fun getURL(): String {
@@ -20,12 +40,12 @@ class Playlist(url: String?, description: String?, image: String?) {
         url = name!!
     }
 
-    fun getDescription(): String {
-        return description
+    fun getDuration(): String {
+        return duration
     }
 
-    fun setDescription(name: String?){
-        description = name!!
+    fun setDuration(name: String?){
+        duration = name!!
     }
 
     fun getImage(): String {

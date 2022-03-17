@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +16,8 @@ import com.kwakujonah.spotifymooder.databinding.ActivityListsBinding
 import com.kwakujonah.spotifymooder.interfaces.ConnectivityApi
 import com.kwakujonah.spotifymooder.model.Playlist
 import com.kwakujonah.spotifymooder.network.Interfaces
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Transformation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,6 +25,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Retrofit
+import java.util.*
 
 class ListsActivity : AppCompatActivity() {
 
@@ -32,10 +35,13 @@ class ListsActivity : AppCompatActivity() {
     lateinit var spinKitView : SpinKitView
     lateinit var contentLay : LinearLayout
     lateinit var playlistsRv : RecyclerView
+    lateinit var imgView : ImageView
+    private lateinit var bearer : String;
 
     private val playlists = ArrayList<Playlist>()
     private lateinit var playlistsAdapter: PlaylistAdapter
     lateinit var mood: String
+    private lateinit var rand: Random
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,13 +55,14 @@ class ListsActivity : AppCompatActivity() {
 
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "Playlists"
+        supportActionBar?.title = ""
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         spinKitView = findViewById(R.id.spin_kit)
         contentLay = findViewById(R.id.contentLay)
         playlistsRv = findViewById(R.id.playlistsRv)
+        imgView = findViewById(R.id.imgView)
 
         val itemOnClick: (Int) -> Unit = { position ->
             Log.d("Selected playlist", playlists[position].getURL())
@@ -65,12 +72,12 @@ class ListsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        rand = Random()
+
         playlistsAdapter = PlaylistAdapter(playlists,  itemClickListener = itemOnClick)
-        val layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
+        val layoutManager = LinearLayoutManager(applicationContext)
         playlistsRv.layoutManager = layoutManager
         playlistsRv.adapter = playlistsAdapter
-
-
 
         getToken()
 
@@ -90,6 +97,7 @@ class ListsActivity : AppCompatActivity() {
                     response.body()?.let {
                         val rrt: String = it.string()
                         var jsonArray = JSONObject(rrt)
+                        bearer = jsonArray["access_token"].toString();
                         Log.d("Result", jsonArray["access_token"] as String)
                         getPlaylist(jsonArray["access_token"] as String, mood)
                     }
@@ -122,25 +130,20 @@ class ListsActivity : AppCompatActivity() {
                         val rrt: String = it.string()
                         var jsonArray = JSONObject(rrt)
                         if(jsonArray.has("playlists")){
-                            Log.d("Result", "Found")
 
                             spinKitView.visibility = View.GONE
                             contentLay.visibility = View.VISIBLE
 
                             var jsonLists: JSONObject = jsonArray["playlists"] as JSONObject
                             var jsonItems: JSONArray = jsonLists["items"] as JSONArray
-                            for (i in 0 until jsonItems.length()){
-                                var ddt = jsonItems.getJSONObject(i)
 
-                                var jsonImages: JSONArray = ddt["images"] as JSONArray
-                                var jsonUrls: JSONObject = ddt["external_urls"] as JSONObject
+                            val ddt = rand.nextInt(jsonItems.length())
+                            var ddr = jsonItems.getJSONObject(ddt)
+                            var jsonImages: JSONArray = ddr["images"] as JSONArray
+                            Log.d("Selected Playlist", ddr["id"] as String)
 
-                                var lists = Playlist(jsonUrls["spotify"] as String?, ddt["description"].toString(),
-                                    jsonImages.getJSONObject(0)["url"] as String?
-                                )
-                                playlists.add(lists)
-                            }
-                            playlistsAdapter.notifyDataSetChanged()
+                            getPlaylistItems(ddr["id"] as String)
+                            Picasso.get().load(jsonImages.getJSONObject(0)["url"].toString()).into(imgView)
                         }else{
                             spinKitView.visibility = View.GONE
                             contentLay.visibility = View.VISIBLE
@@ -152,6 +155,48 @@ class ListsActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun getPlaylistItems(playlistId:String){
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.spotify.com/v1/playlists/$playlistId/")
+            .build()
+
+        val service = retrofit.create(ConnectivityApi::class.java)
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = service.getPlaylistItems(getHeaderMap(bearer))
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        val rrt: String = it.string()
+                        var jsonArray = JSONObject(rrt)
+                        if (jsonArray.has("items")) {
+                            var jsonSongLists: JSONArray = jsonArray["items"] as JSONArray
+                            (0 until jsonSongLists.length()).forEach {
+
+                                var jsonSongDetails: JSONObject = jsonSongLists.getJSONObject(it)["track"] as JSONObject
+                                var jsonAlbumDetails: JSONObject = jsonSongDetails["album"] as JSONObject
+                                var jsonImageDetails: JSONArray = jsonAlbumDetails["images"] as JSONArray
+
+                                var pSongName: String = jsonSongDetails.getString("name")
+                                var pSongDuration: String = jsonSongDetails.getString("duration_ms")
+                                var pSongURL : String = "https://open.spotify.com/track/"+jsonSongDetails.getString("id")
+
+                                Log.d("Song Artist", pSongName)
+                                var list = Playlist(pSongName, "kwaku.jonah", pSongURL, pSongDuration, "https://i.scdn.co/image/ab67616d0000b27362a01b107a218d251f3f74ca")
+                                playlists.add(list)
+                                playlistsAdapter.notifyDataSetChanged()
+
+                            }
+
+                        } else {
+                            Log.d("Results", "No items found!!!")
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
 }

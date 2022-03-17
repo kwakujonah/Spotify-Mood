@@ -15,5 +15,7 @@ interface ConnectivityApi {
     @GET("playlists/")
     suspend fun getPlaylists(@HeaderMap headers: Map<String, String>): Response<ResponseBody>
 
+    @GET("tracks")
+    suspend fun getPlaylistItems(@HeaderMap headers: Map<String, String>): Response<ResponseBody>
 
 }
