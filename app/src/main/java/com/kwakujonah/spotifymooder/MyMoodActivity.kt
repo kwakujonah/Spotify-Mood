@@ -68,7 +68,7 @@ class MyMoodActivity : AppCompatActivity() {
         itemsList.add("sleep")
         itemsList.add("party")
         itemsList.add("chill")
-        itemsList.add("alternative")
+        itemsList.add("focus")
         customAdapter.notifyDataSetChanged()
     }
 

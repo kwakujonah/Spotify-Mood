@@ -31,7 +31,7 @@ class CustomAdapter(private var itemsList: List<String>, private val itemClickLi
             "sleep" -> Picasso.get().load(R.drawable.sleep).into(holder.itemImageView)
             "party" -> Picasso.get().load(R.drawable.smile).into(holder.itemImageView)
             "chill" -> Picasso.get().load(R.drawable.sarcastic).into(holder.itemImageView)
-            "alternative" -> Picasso.get().load(R.drawable.thinking).into(holder.itemImageView)
+            "focus" -> Picasso.get().load(R.drawable.thinking).into(holder.itemImageView)
         }
         holder.itemTextView.text = itemsList[position]
     }

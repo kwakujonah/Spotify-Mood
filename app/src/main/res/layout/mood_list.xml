@@ -6,9 +6,9 @@
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_corner"
     android:paddingLeft="24dp"
-    android:paddingTop="120dp"
+    android:paddingTop="100dp"
     android:paddingRight="24dp"
-    android:paddingBottom="120dp"
+    android:paddingBottom="100dp"
     android:layout_margin="24dp">
 
     <ImageView

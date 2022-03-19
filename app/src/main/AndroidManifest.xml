@@ -16,7 +16,12 @@
             android:name=".ListsActivity"
             android:exported="false"
             android:label="@string/title_activity_lists"
-            android:theme="@style/Theme.SpotifyMooder.NoActionBar" />
+            android:theme="@style/Theme.SpotifyMooder.NoActionBar"
+            android:parentActivityName=".MyMoodActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MyMoodActivity" />
+        </activity>
         <activity
             android:name=".MyMoodActivity"
             android:exported="true"

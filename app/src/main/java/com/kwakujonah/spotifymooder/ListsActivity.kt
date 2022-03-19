@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kwakujonah.spotifymooder.adapter.PlaylistAdapter
 import com.kwakujonah.spotifymooder.databinding.ActivityListsBinding
 import com.kwakujonah.spotifymooder.interfaces.ConnectivityApi
@@ -26,6 +27,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Retrofit
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class ListsActivity : AppCompatActivity() {
 
@@ -36,12 +38,14 @@ class ListsActivity : AppCompatActivity() {
     lateinit var contentLay : LinearLayout
     lateinit var playlistsRv : RecyclerView
     lateinit var imgView : ImageView
+    lateinit var playBtn : FloatingActionButton
     private lateinit var bearer : String;
 
     private val playlists = ArrayList<Playlist>()
     private lateinit var playlistsAdapter: PlaylistAdapter
     lateinit var mood: String
     private lateinit var rand: Random
+    lateinit var playUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +67,7 @@ class ListsActivity : AppCompatActivity() {
         contentLay = findViewById(R.id.contentLay)
         playlistsRv = findViewById(R.id.playlistsRv)
         imgView = findViewById(R.id.imgView)
+        playBtn = findViewById(R.id.playBtn)
 
         val itemOnClick: (Int) -> Unit = { position ->
             Log.d("Selected playlist", playlists[position].getURL())
@@ -71,6 +76,12 @@ class ListsActivity : AppCompatActivity() {
             intent.data = Uri.parse(playlists[position].getURL())
             startActivity(intent)
         }
+
+        playBtn.setOnClickListener(View.OnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(playUrl)
+            startActivity(intent)
+        })
 
         rand = Random()
 
@@ -105,6 +116,8 @@ class ListsActivity : AppCompatActivity() {
                     Log.d("Result", response.code().toString())
                 }
             }
+
+
         }
     }
 
@@ -140,14 +153,16 @@ class ListsActivity : AppCompatActivity() {
                             val ddt = rand.nextInt(jsonItems.length())
                             var ddr = jsonItems.getJSONObject(ddt)
                             var jsonImages: JSONArray = ddr["images"] as JSONArray
-                            Log.d("Selected Playlist", ddr["id"] as String)
+                            var jsonUrls: JSONObject = ddr["external_urls"] as JSONObject
+                            Log.d("Selected Playlist", jsonUrls.getString("spotify"))
+
+                            playUrl = jsonUrls.getString("spotify")
 
                             getPlaylistItems(ddr["id"] as String)
                             Picasso.get().load(jsonImages.getJSONObject(0)["url"].toString()).into(imgView)
                         }else{
                             spinKitView.visibility = View.GONE
                             contentLay.visibility = View.VISIBLE
-                            Log.d("Result", "Failed")
                         }
                     }
                 }else{
@@ -177,15 +192,20 @@ class ListsActivity : AppCompatActivity() {
                                 var jsonSongDetails: JSONObject = jsonSongLists.getJSONObject(it)["track"] as JSONObject
                                 var jsonAlbumDetails: JSONObject = jsonSongDetails["album"] as JSONObject
                                 var jsonImageDetails: JSONArray = jsonAlbumDetails["images"] as JSONArray
+                                var jsonArtistDetails: JSONArray = jsonAlbumDetails["artists"] as JSONArray
+                                var imgs: JSONObject = jsonImageDetails[0] as JSONObject
+                                var artist: JSONObject = jsonArtistDetails[0] as JSONObject
 
                                 var pSongName: String = jsonSongDetails.getString("name")
-                                var pSongDuration: String = jsonSongDetails.getString("duration_ms")
+                                var pSongDuration: String = jsonSongDetails.getString("duration_ms") as String
                                 var pSongURL : String = "https://open.spotify.com/track/"+jsonSongDetails.getString("id")
+                                var pSongCover: String = imgs.getString("url")
+                                var pSongArtist: String = artist.getString("name")
 
-                                Log.d("Song Artist", pSongName)
-                                var list = Playlist(pSongName, "kwaku.jonah", pSongURL, pSongDuration, "https://i.scdn.co/image/ab67616d0000b27362a01b107a218d251f3f74ca")
+                                var list = Playlist(pSongName, pSongArtist, pSongURL, "", pSongCover)
                                 playlists.add(list)
                                 playlistsAdapter.notifyDataSetChanged()
+                                playBtn.visibility = View.VISIBLE
 
                             }
 
