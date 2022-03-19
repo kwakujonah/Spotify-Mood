@@ -7,7 +7,7 @@ import retrofit2.http.*
 interface ConnectivityApi {
 
     @FormUrlEncoded
-    @Headers("Authorization: Basic MTRiYWZiMTRjNDc5NGIzNzgyMGUxYmY3NjhmNmU5MWY6YTYzMGMwNzg0MmM4NGI3ZDgxOGUyMjViOTU5NzZlZjI=", "Content-Type: application/x-www-form-urlencoded")
+    @Headers("Authorization: Basic ", "Content-Type: application/x-www-form-urlencoded")
     @POST("api/token")
     suspend fun createToken(@Field("grant_type") first: String): Response<ResponseBody>
 

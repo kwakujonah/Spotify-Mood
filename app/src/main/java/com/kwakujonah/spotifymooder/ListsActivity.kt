@@ -16,7 +16,6 @@ import com.kwakujonah.spotifymooder.adapter.PlaylistAdapter
 import com.kwakujonah.spotifymooder.databinding.ActivityListsBinding
 import com.kwakujonah.spotifymooder.interfaces.ConnectivityApi
 import com.kwakujonah.spotifymooder.model.Playlist
-import com.kwakujonah.spotifymooder.network.Interfaces
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +32,6 @@ class ListsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityListsBinding
 
-    private lateinit var interfaces : Interfaces
     lateinit var spinKitView : SpinKitView
     lateinit var contentLay : LinearLayout
     lateinit var playlistsRv : RecyclerView
@@ -51,7 +49,6 @@ class ListsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityListsBinding.inflate(layoutInflater)
-        interfaces = Interfaces()
         setContentView(binding.root)
 
         mood = intent.getStringExtra("mood-message").toString()
